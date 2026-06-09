@@ -11,8 +11,7 @@ const ALL = "all";
 export function CategorySlider({ categories }: { categories: Category[] }) {
   const pathname = usePathname();
   // "/" → all; "/<id>" → that category id.
-  const active =
-    pathname === "/" ? ALL : decodeURIComponent(pathname.slice(1));
+  const active = pathname === "/" ? ALL : decodeURIComponent(pathname.slice(1));
   const scrollerRef = useRef<HTMLUListElement>(null);
 
   function scrollBy(direction: 1 | -1) {
@@ -76,7 +75,7 @@ function CategoryPill({
       {avatar ? (
         <span className="relative h-8 w-8 overflow-hidden rounded-full ring-2 ring-white/60">
           <Image
-            src={avatar}
+            src={"/food.jpg"}
             alt=""
             fill
             sizes="32px"
@@ -108,7 +107,9 @@ function ScrollButton({
     <button
       type="button"
       onClick={onClick}
-      aria-label={side === "left" ? "Scroll categories left" : "Scroll categories right"}
+      aria-label={
+        side === "left" ? "Scroll categories left" : "Scroll categories right"
+      }
       className={`absolute top-1/2 z-10 hidden -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-brand-100 bg-white/90 p-2 text-brand-600 shadow-sm backdrop-blur transition-colors duration-200 hover:bg-brand-50 md:flex ${
         side === "left" ? "left-2" : "right-2"
       }`}
