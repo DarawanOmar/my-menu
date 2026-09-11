@@ -9,11 +9,7 @@ import { ProductCard } from "./product-card";
  * prerendered. The cached `getItems*` functions key on `categoryId` and
  * revalidate once a day.
  */
-export async function ProductGrid({
-  categoryId,
-}: {
-  categoryId?: string;
-}) {
+export async function ProductGrid({ categoryId }: { categoryId?: string }) {
   const isAll = !categoryId;
 
   const [items, categories] = await Promise.all([
@@ -45,7 +41,7 @@ export async function ProductGrid({
       {items.length === 0 ? (
         <EmptyState />
       ) : (
-        <ul className="grid grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-3 sm:gap-x-5 sm:gap-y-8 lg:grid-cols-4">
+        <ul className="grid  grid-cols-1 gap-x-3 gap-y-6 sm:grid-cols-2  sm:gap-x-5 sm:gap-y-8 md:grid-cols-3 lg:grid-cols-4">
           {items.map((item, index) => (
             <ProductCard key={item.id} item={item} index={index} />
           ))}
@@ -65,11 +61,7 @@ function EmptyState() {
         The kitchen hasn’t added dishes here. Everything on the menu is one tap
         away.
       </p>
-      <Link
-        href="/"
-        scroll={false}
-        className="btn btn-ink mt-6 inline-flex"
-      >
+      <Link href="/" scroll={false} className="btn btn-ink mt-6 inline-flex">
         See everything
         <ArrowRightIcon className="size-4" />
       </Link>
