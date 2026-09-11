@@ -1,9 +1,11 @@
 "use client";
 
-import Image from "next/image";
+import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useRef } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
+import { ChevronLeftIcon, ChevronRightIcon } from "@/components/icons";
+import { EASE_OUT } from "@/lib/motion";
 import type { Category } from "@/lib/types";
 
 const ALL = "all";
@@ -12,87 +14,125 @@ export function CategorySlider({ categories }: { categories: Category[] }) {
   const pathname = usePathname();
   // "/" → all; "/<id>" → that category id.
   const active = pathname === "/" ? ALL : decodeURIComponent(pathname.slice(1));
+  const navRef = useRef<HTMLElement>(null);
   const scrollerRef = useRef<HTMLUListElement>(null);
+  // Set when the user picks a tab; consumed once the new route has committed.
+  const pendingReveal = useRef(false);
+  const reduced = useReducedMotion();
+
+  // After the active tab changes: centre it in the strip, and — if the change
+  // came from a tap while the user was still up in the hero — bring the grid
+  // into view. Back/forward navigation leaves the scroll position alone.
+  useEffect(() => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+    const reveal = pendingReveal.current;
+    pendingReveal.current = false;
+
+    const el = scroller.querySelector<HTMLElement>('[aria-current="page"]');
+    if (el) {
+      const left = el.offsetLeft - (scroller.clientWidth - el.offsetWidth) / 2;
+      // Snap the strip instantly when the page itself is about to scroll, so
+      // the two smooth scrolls never fight.
+      scroller.scrollTo({ left, behavior: reduced || reveal ? "auto" : "smooth" });
+    }
+
+    if (!reveal) return;
+    const menu = document.getElementById("menu");
+    if (!menu) return;
+    const barHeight = navRef.current?.offsetHeight ?? 64;
+    const top = menu.getBoundingClientRect().top;
+    if (top > barHeight + 8) {
+      window.scrollTo({
+        top: window.scrollY + top - barHeight,
+        behavior: reduced ? "auto" : "smooth",
+      });
+    }
+  }, [active, reduced]);
 
   function scrollBy(direction: 1 | -1) {
-    scrollerRef.current?.scrollBy({
-      left: direction * 280,
-      behavior: "smooth",
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+    scroller.scrollBy({
+      left: direction * scroller.clientWidth * 0.6,
+      behavior: reduced ? "auto" : "smooth",
     });
   }
 
+  function revealMenu() {
+    pendingReveal.current = true;
+  }
+
   return (
-    <div className="relative">
-      {/* Arrow controls (hidden on touch-first small screens) */}
-      <ScrollButton side="left" onClick={() => scrollBy(-1)} />
-      <ScrollButton side="right" onClick={() => scrollBy(1)} />
+    <nav
+      ref={navRef}
+      aria-label="Menu categories"
+      className="reveal sticky top-0 z-(--z-sticky) border-b border-rule bg-paper"
+      style={{ "--i": 2 } as CSSProperties}
+    >
+      <div className="relative mx-auto w-full max-w-(--page-max)">
+        <ScrollButton side="left" onClick={() => scrollBy(-1)} />
+        <ScrollButton side="right" onClick={() => scrollBy(1)} />
 
-      <ul
-        ref={scrollerRef}
-        className="no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth px-5 py-2 sm:px-8"
-      >
-        <li className="snap-start">
-          <CategoryPill href="/" label="All" isActive={active === ALL} />
-        </li>
-
-        {categories.map((category) => (
-          <li key={category.id} className="snap-start">
-            <CategoryPill
+        <ul
+          ref={scrollerRef}
+          // On md+ the strip starts after the arrow buttons; the edge fade follows.
+          className="no-scrollbar fade-x flex gap-1.5 overflow-x-auto px-(--page-gutter) py-3 md:px-16 md:[--fade-edge:4rem]"
+        >
+          <Tab
+            href="/"
+            label="All"
+            isActive={active === ALL}
+            onNavigate={revealMenu}
+          />
+          {categories.map((category) => (
+            <Tab
+              key={category.id}
               href={`/${category.id}`}
               label={category.name}
-              avatar={category.avatar}
               isActive={active === category.id}
+              onNavigate={revealMenu}
             />
-          </li>
-        ))}
-      </ul>
-    </div>
+          ))}
+        </ul>
+      </div>
+    </nav>
   );
 }
 
-function CategoryPill({
+function Tab({
   href,
   label,
-  avatar,
   isActive,
+  onNavigate,
 }: {
   href: string;
   label: string;
-  avatar?: string;
   isActive: boolean;
+  onNavigate: () => void;
 }) {
   return (
-    <Link
-      href={href}
-      scroll={false}
-      aria-current={isActive ? "true" : undefined}
-      className={`group flex shrink-0 cursor-pointer items-center gap-2.5 rounded-full border px-3.5 py-2 text-sm font-semibold transition-colors duration-200 ${
-        isActive
-          ? "border-brand-600 bg-brand-600 text-white shadow-sm shadow-brand-600/30"
-          : "border-brand-100 bg-white text-ink/80 hover:border-brand-300 hover:bg-brand-50"
-      }`}
-    >
-      {avatar ? (
-        <span className="relative h-8 w-8 overflow-hidden rounded-full ring-2 ring-white/60">
-          <Image
-            src={"/food.jpg"}
-            alt=""
-            fill
-            sizes="32px"
-            className="object-cover"
+    <li className="shrink-0">
+      <Link
+        href={href}
+        scroll={false}
+        onNavigate={onNavigate}
+        aria-current={isActive ? "page" : undefined}
+        className={`relative isolate inline-flex h-10 items-center rounded-pill px-4 text-sm font-medium whitespace-nowrap transition-colors duration-220 ease-out ${
+          isActive ? "text-paper" : "text-ink-2 hover:bg-paper-2 hover:text-ink"
+        }`}
+      >
+        {isActive && (
+          // Shared layout id: the ink pill slides from the old tab to the new one.
+          <motion.span
+            layoutId="category-active"
+            className="absolute inset-0 -z-10 rounded-pill bg-ink"
+            transition={{ duration: 0.35, ease: EASE_OUT }}
           />
-        </span>
-      ) : (
-        <span
-          className={`flex h-8 w-8 items-center justify-center rounded-full ${
-            isActive ? "bg-white/20" : "bg-brand-50 text-brand-600"
-          }`}
-        >
-          <GridIcon className="h-4 w-4" />
-        </span>
-      )}
-      <span className="whitespace-nowrap pr-1">{label}</span>
-    </Link>
+        )}
+        {label}
+      </Link>
+    </li>
   );
 }
 
@@ -110,50 +150,15 @@ function ScrollButton({
       aria-label={
         side === "left" ? "Scroll categories left" : "Scroll categories right"
       }
-      className={`absolute top-1/2 z-10 hidden -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-brand-100 bg-white/90 p-2 text-brand-600 shadow-sm backdrop-blur transition-colors duration-200 hover:bg-brand-50 md:flex ${
-        side === "left" ? "left-2" : "right-2"
+      className={`icon-btn absolute top-1/2 z-(--z-raised) hidden -translate-y-1/2 bg-paper-2 text-ink hover:bg-paper-3 md:inline-grid ${
+        side === "left" ? "left-3" : "right-3"
       }`}
     >
-      <ChevronIcon
-        className={`h-5 w-5 ${side === "left" ? "rotate-180" : ""}`}
-      />
+      {side === "left" ? (
+        <ChevronLeftIcon className="size-5" />
+      ) : (
+        <ChevronRightIcon className="size-5" />
+      )}
     </button>
-  );
-}
-
-function ChevronIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <path d="m9 6 6 6-6 6" />
-    </svg>
-  );
-}
-
-function GridIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <rect x="3" y="3" width="7" height="7" rx="1.5" />
-      <rect x="14" y="3" width="7" height="7" rx="1.5" />
-      <rect x="3" y="14" width="7" height="7" rx="1.5" />
-      <rect x="14" y="14" width="7" height="7" rx="1.5" />
-    </svg>
   );
 }

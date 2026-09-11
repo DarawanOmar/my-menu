@@ -1,65 +1,105 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useCart, useMenuUI } from "@/components/cart/cart-provider";
+import { CheckIcon, PlusIcon } from "@/components/icons";
+import { formatPrice, priceOf } from "@/lib/cart";
+import { dishImage } from "@/lib/dish-images";
 import type { MenuItem } from "@/lib/types";
 
-const priceFormatter = new Intl.NumberFormat("en-US", {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-});
-
-export function ProductCard({ item }: { item: MenuItem }) {
-  const price = Number(item.price);
+/**
+ * F6 product card — round plate · name · price · one micro-action.
+ * Tapping the plate or the name opens the detail sheet; the round button adds
+ * one straight to the cart.
+ */
+export function ProductCard({
+  item,
+  index,
+}: {
+  item: MenuItem;
+  index: number;
+}) {
+  const { openSheet } = useMenuUI();
+  const price = priceOf(item);
 
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl border border-brand-100 bg-white shadow-sm transition-colors duration-200 hover:border-brand-300">
-      <div className="relative aspect-[4/3] overflow-hidden bg-brand-50">
-        <Image
-          src={"/food.jpg"}
-          // src={item.avatar}
-          alt={item.name}
-          fill
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
-          className="object-cover"
-        />
-        <span className="absolute right-3 top-3 rounded-full bg-gold-600 px-3 py-1 text-sm font-bold text-white shadow-sm">
-          {Number.isFinite(price)
-            ? `$${priceFormatter.format(price)}`
-            : item.price}
-        </span>
-      </div>
-
-      <div className="flex flex-1 flex-col gap-2 p-4">
-        <h3 className="font-display text-lg font-semibold leading-snug text-ink">
-          {item.name}
-        </h3>
-        <p className="line-clamp-2 text-sm leading-6 text-ink/60">
-          {item.description}
-        </p>
-
+    <li
+      className="reveal min-w-0"
+      // Cap the stagger so the 12th card onward arrives with the 12th — the
+      // whole entrance settles in ~0.5 s no matter how long the menu is.
+      style={{ "--i": Math.min(index, 11) } as CSSProperties}
+    >
+      <article className="card relative flex h-full flex-col rounded-card bg-paper-2 p-4 pt-5 sm:p-5 sm:pt-6">
         <button
           type="button"
-          className="mt-auto flex h-11 cursor-pointer items-center justify-center gap-2 rounded-full bg-brand-600 px-4 text-sm font-semibold text-white transition-colors duration-200 hover:bg-brand-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
+          onClick={() => openSheet(item)}
+          aria-label={`View ${item.name}`}
+          className="plate-btn mx-auto block w-[74%] rounded-full sm:w-[70%]"
         >
-          <PlusIcon className="h-4 w-4" />
-          Add to order
+          <span className="plate">
+            <Image
+              src={dishImage(item.id)}
+              alt=""
+              fill
+              sizes="(max-width: 40rem) 40vw, (max-width: 64rem) 24vw, 220px"
+              className="object-cover"
+            />
+          </span>
         </button>
-      </div>
-    </article>
+
+        <h3 className="mt-5 text-md leading-snug font-semibold text-ink">
+          <button
+            type="button"
+            onClick={() => openSheet(item)}
+            className="rounded-sm text-left"
+          >
+            {item.name}
+          </button>
+        </h3>
+
+        <div className="mt-auto flex items-end justify-between gap-3 pt-3">
+          <p className="tabular text-base font-semibold text-ink">
+            {formatPrice(price)}
+          </p>
+          <AddButton item={item} />
+        </div>
+      </article>
+    </li>
   );
 }
 
-function PlusIcon({ className }: { className?: string }) {
+function AddButton({ item }: { item: MenuItem }) {
+  const { add } = useCart();
+  const [added, setAdded] = useState(false);
+  const timer = useRef<number | undefined>(undefined);
+
+  useEffect(() => () => window.clearTimeout(timer.current), []);
+
+  function handleAdd() {
+    add(item, 1);
+    setAdded(true);
+    window.clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => setAdded(false), 1200);
+  }
+
   return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
+    <button
+      type="button"
+      onClick={handleAdd}
+      aria-label={`Add ${item.name} to cart`}
+      data-state={added ? "success" : undefined}
+      className="icon-btn add-btn bg-ink text-paper hover:bg-ink-2"
     >
-      <path d="M12 5v14M5 12h14" />
-    </svg>
+      <span className="ico ico-plus">
+        <PlusIcon className="size-5" />
+      </span>
+      <span className="ico ico-check">
+        <CheckIcon className="size-5" />
+      </span>
+      <span className="sr-only" aria-live="polite">
+        {added ? "Added to cart" : ""}
+      </span>
+    </button>
   );
 }

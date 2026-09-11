@@ -1,6 +1,4 @@
 import { Suspense } from "react";
-import { Banner } from "@/components/banner";
-import { CategoryBar } from "@/components/category-bar";
 import { ProductGrid } from "@/components/product-grid";
 import { ProductGridSkeleton } from "@/components/product-grid-skeleton";
 import { getCategories } from "@/lib/api";
@@ -17,6 +15,9 @@ import { getCategories } from "@/lib/api";
  * (Next.js has no mechanism to pre-generate searchParams). Because Cache
  * Components is enabled, this MUST return at least one entry — it does (the
  * index route is always included).
+ *
+ * The header, hero, category tabs and footer live in `app/layout.tsx`, so a
+ * page is just the grid for its category.
  */
 export async function generateStaticParams() {
   const categories = await getCategories();
@@ -37,23 +38,8 @@ export default async function Home({
   const categoryId = category?.[0]; // undefined ⇒ show all dishes
 
   return (
-    <main className="flex flex-1 flex-col bg-cream">
-      <Banner />
-      <CategoryBar />
-
-      <Suspense key={categoryId ?? "all"} fallback={<ProductGridSkeleton />}>
-        <ProductGrid categoryId={categoryId} />
-      </Suspense>
-
-      <footer className="mt-auto border-t border-brand-100 bg-white">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-5 py-8 text-sm text-ink/60 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-          <p className="font-display text-base font-semibold text-ink">
-            Birga Restaurant
-          </p>
-          <p>Erbil — Shorsh · Open daily 11:00 — 23:00</p>
-          <p>© 2026 Birga. All rights reserved.</p>
-        </div>
-      </footer>
-    </main>
+    <Suspense key={categoryId ?? "all"} fallback={<ProductGridSkeleton />}>
+      <ProductGrid categoryId={categoryId} />
+    </Suspense>
   );
 }

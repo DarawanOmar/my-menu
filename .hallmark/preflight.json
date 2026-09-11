@@ -1,0 +1,19 @@
+{
+  "scannedAt": "2026-09-11",
+  "framework": "Next.js 16.2.7 (app router, cacheComponents, reactCompiler)",
+  "styling": "Tailwind v4 (@import \"tailwindcss\" + @theme in app/globals.css)",
+  "fonts": {
+    "before": "Playfair Display + Karla via next/font/google (app/layout.tsx)",
+    "after": "Bricolage Grotesque (display) + Geist (body) + Fraunces (wordmark/statement outlier)"
+  },
+  "palette": {
+    "before": "hex red/gold brand scale in @theme (app/globals.css)",
+    "after": "OKLCH sage-tinted tokens in tokens.css"
+  },
+  "motion": {
+    "before": "motion-cut (no library)",
+    "after": "motion 13.2.0 (motion/react) — reduced-motion honoured via MotionConfig"
+  },
+  "spacing": "Tailwind default 4-pt scale + --space-* role tokens in tokens.css",
+  "designMd": false
+}

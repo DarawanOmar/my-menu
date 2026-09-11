@@ -1,29 +1,33 @@
 /**
  * Shown as the `<Suspense>` fallback while the category's items are fetched.
- * Reserves the same layout to avoid content jumping.
+ * Mirrors the real grid so nothing jumps when the cards arrive.
  */
 export function ProductGridSkeleton() {
   return (
-    <section className="mx-auto w-full max-w-6xl px-5 py-8 sm:px-8 sm:py-10">
-      <div className="mb-6">
-        <div className="h-8 w-48 animate-pulse rounded-lg bg-brand-100" />
-        <div className="mt-2 h-4 w-24 animate-pulse rounded bg-brand-100/70" />
+    <section
+      aria-busy="true"
+      aria-label="Loading dishes"
+      className="mx-auto w-full max-w-(--page-max) px-(--page-gutter) pt-10 pb-16 sm:pt-14"
+    >
+      <div className="mb-8 flex items-baseline justify-between">
+        <div className="skeleton h-9 w-44 rounded-input" />
+        <div className="skeleton h-4 w-16 rounded-input" />
       </div>
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div
+      <ul className="grid grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-3 sm:gap-x-5 sm:gap-y-8 lg:grid-cols-4">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <li
             key={i}
-            className="overflow-hidden rounded-2xl border border-brand-100 bg-white"
+            className="flex flex-col rounded-card bg-paper-2 p-4 pt-5 sm:p-5 sm:pt-6"
           >
-            <div className="aspect-[4/3] animate-pulse bg-brand-100" />
-            <div className="space-y-3 p-4">
-              <div className="h-5 w-3/4 animate-pulse rounded bg-brand-100" />
-              <div className="h-4 w-full animate-pulse rounded bg-brand-100/70" />
-              <div className="h-11 w-full animate-pulse rounded-full bg-brand-100/70" />
+            <div className="skeleton mx-auto aspect-square w-[74%] rounded-full sm:w-[70%]" />
+            <div className="skeleton mt-5 h-5 w-4/5 rounded-input" />
+            <div className="mt-3 flex items-end justify-between pt-3">
+              <div className="skeleton h-5 w-16 rounded-input" />
+              <div className="skeleton size-11 rounded-full" />
             </div>
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   );
 }

@@ -52,20 +52,48 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ```
 app/
-  layout.tsx              ← fonts, metadata, <html>/<body> shell
+  layout.tsx              ← fonts, metadata, persistent shell (header · hero · tabs · footer · overlays)
+  globals.css             ← base rules + component classes (imports ../tokens.css)
   [[...category]]/
-    page.tsx              ← optional catch-all route + generateStaticParams
+    page.tsx              ← optional catch-all route + generateStaticParams → renders the grid only
+tokens.css                ← design tokens (colours, type, radii, easings) — Tailwind @theme + :root
 components/
-  banner.tsx              ← hero banner
+  app-shell.tsx           ← "use client" — goes `inert` + locks scroll while an overlay is open
+  site-header.tsx         ← wordmark + cart button
+  banner.tsx              ← hero: headline with live dish/category counts + plate cluster
   category-bar.tsx        ← server component, reads cached categories
-  category-slider.tsx     ← "use client" — highlights active category from the URL
+  category-slider.tsx     ← "use client" — sticky tabs; ink pill slides to the active category
   product-grid.tsx        ← server component, fetches dishes for the route
-  product-card.tsx        ← single dish card
+  product-card.tsx        ← "use client" — round plate · name · price · quick-add
+  product-sheet.tsx       ← "use client" — dish detail: bottom sheet (phone) / side panel (desktop)
   product-grid-skeleton.tsx ← Suspense fallback
+  site-footer.tsx         ← closing statement + meta
+  cart/
+    cart-provider.tsx     ← cart + overlay state contexts (useCart / useMenuUI)
+    cart-button.tsx       ← header button with count badge
+    cart-drawer.tsx       ← right-hand drawer: lines, steppers, remove + undo, subtotal
+    cart-bar.tsx          ← floating "N items · $total — View cart" bar
+  ui/                     ← stepper, dialog a11y hook, media-query hook
+  icons.tsx               ← one stroke-voice icon set
 lib/
   api.ts                  ← all data fetching + caching lives here
+  cart.ts                 ← cart types + price helpers
+  cart-store.ts           ← external store (useSyncExternalStore) persisted to localStorage
+  dish-images.ts          ← placeholder plate photography mapped by item id
+  motion.ts               ← shared easings/durations for motion/react
   types.ts                ← Category / MenuItem types
 ```
+
+### Cart
+
+The cart is client-only state persisted to `localStorage` (`birga.cart.v1`) and
+synced across tabs. There is **no checkout backend** — the Checkout button says
+so inline. Animations use [`motion`](https://motion.dev) (`motion/react`) and
+honour `prefers-reduced-motion`.
+
+The mock API's `avatar` field holds person portraits, so `lib/dish-images.ts`
+maps each item to a placeholder plate photo. Swap it for `item.avatar` once the
+API serves real dish photography.
 
 ### Routing — one optional catch-all
 

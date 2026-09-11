@@ -1,137 +1,131 @@
 import Image from "next/image";
+import type { CSSProperties } from "react";
+import { ArrowDownIcon, ClockIcon, UtensilsIcon } from "@/components/icons";
+import { getAllItems, getCategories } from "@/lib/api";
+import { HERO_PLATES } from "@/lib/dish-images";
 
 /**
- * Hero banner for Birga Restaurant. Static content, so it lives in the
- * prerendered shell and renders instantly.
+ * Hero — H2 split diptych (7/5). Copy left, a cluster of plates right, on a
+ * single sage panel. The dish and category counts are real (cached API data),
+ * so the headline is an honest inventory header rather than a slogan.
  */
-export function Banner() {
+export async function Banner() {
+  const [items, categories] = await Promise.all([
+    getAllItems(),
+    getCategories(),
+  ]);
+
   return (
-    <section className="relative isolate overflow-hidden">
-      {/* Restaurant photography */}
-      <Image
-        src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1920&q=80"
-        alt="The warm, candle-lit dining room at Birga Restaurant"
-        fill
-        priority
-        sizes="100vw"
-        className="-z-10 object-cover"
-      />
-      {/* Readability gradient over the photo */}
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-gradient-to-t from-ink/90 via-ink/55 to-ink/30"
-      />
-
-      <div className="mx-auto flex min-h-[60vh] w-full max-w-6xl flex-col justify-end px-5 pb-12 pt-28 sm:min-h-[68vh] sm:px-8 sm:pb-16">
-        <span className="mb-4 inline-flex w-fit items-center gap-2 rounded-full border border-gold-400/40 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-gold-400 backdrop-blur">
-          <LocationIcon className="h-3.5 w-3.5" />
-          Erbil — Shorsh
-        </span>
-
-        <h1 className="font-display text-5xl font-bold leading-[1.05] text-white drop-shadow-sm sm:text-7xl">
-          Birga Restaurant
-        </h1>
-
-        <p className="mt-4 max-w-xl text-base leading-7 text-white/85 sm:text-lg">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. A handcrafted
-          menu of seasonal dishes, slow-cooked classics, and flavors that bring
-          the whole table together — served with warm Kurdish hospitality in the
-          heart of Shorsh.
-        </p>
-
-        <div className="mt-7 flex flex-wrap items-center gap-3">
-          <InfoChip icon={<ClockIcon className="h-4 w-4" />}>
-            Open daily · 11:00 — 23:00
-          </InfoChip>
-          <InfoChip icon={<StarIcon className="h-4 w-4" />}>
-            4.8 · 1,200+ reviews
-          </InfoChip>
-          <InfoChip icon={<UtensilsIcon className="h-4 w-4" />}>
-            Dine-in &amp; takeaway
-          </InfoChip>
+    <section
+      aria-labelledby="hero-title"
+      className="mx-auto w-full max-w-(--page-max) px-(--page-gutter) pt-3 pb-10 sm:pb-14"
+    >
+      <div className="relative overflow-hidden rounded-panel bg-paper-3 px-6 pt-10 pb-8 sm:px-12 sm:pt-16 sm:pb-12 lg:grid lg:grid-cols-[7fr_5fr] lg:items-center lg:gap-16 lg:py-16">
+        <div className="reveal max-w-[34rem]" style={{ "--i": 1 } as CSSProperties}>
+          <h1
+            id="hero-title"
+            className="text-display font-semibold text-ink"
+          >
+            {items.length} dishes, one kitchen in Shorsh.
+          </h1>
+          <p className="mt-6 max-w-[42ch] text-md text-ink-2">
+            Slow-cooked classics and seasonal plates from Birga in Erbil. Pick
+            from {categories.length} categories below and build your cart.
+          </p>
+          <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted">
+            <li className="flex items-center gap-2">
+              <ClockIcon className="size-4 text-accent" />
+              <span className="tabular">Open daily 11:00–23:00</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <UtensilsIcon className="size-4 text-accent" />
+              Dine-in &amp; takeaway
+            </li>
+          </ul>
+          <a
+            href="#menu"
+            className="link-arrow mt-8 inline-flex h-11 items-center gap-2 rounded-sm text-base font-medium text-ink"
+          >
+            Browse the menu
+            <ArrowDownIcon className="arrow size-4" />
+          </a>
         </div>
+
+        <HeroPlates />
       </div>
     </section>
   );
 }
 
-function InfoChip({
-  icon,
-  children,
-}: {
-  icon: React.ReactNode;
-  children: React.ReactNode;
-}) {
+/**
+ * Three plates on a hand-drawn ribbon. Tier-B enrichment: the ribbon is one
+ * SVG path, the plates are real (placeholder) photography clipped to circles.
+ */
+function HeroPlates() {
   return (
-    <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white/90 backdrop-blur ring-1 ring-white/15">
-      <span className="text-gold-400">{icon}</span>
-      {children}
-    </span>
-  );
-}
-
-function LocationIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
+    <div
+      aria-hidden="true"
+      className="relative mt-10 h-56 sm:h-72 lg:mt-0 lg:h-[24rem]"
     >
-      <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
-      <circle cx="12" cy="10" r="3" />
-    </svg>
-  );
-}
+      <svg
+        viewBox="0 0 400 400"
+        className="absolute inset-0 h-full w-full text-accent-soft"
+        preserveAspectRatio="xMidYMid meet"
+      >
+        <path
+          d="M 38 78 C 128 42, 214 118, 214 206 C 214 296, 300 344, 386 318"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="36"
+          strokeLinecap="round"
+        />
+      </svg>
 
-function ClockIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <circle cx="12" cy="12" r="9" />
-      <path d="M12 7v5l3 2" />
-    </svg>
-  );
-}
+      <figure
+        className="reveal-plate absolute top-[8%] right-[4%] w-[56%] sm:w-[54%]"
+        style={{ "--i": 2 } as CSSProperties}
+      >
+        <span className="plate">
+          <Image
+            src={HERO_PLATES[0]}
+            alt=""
+            fill
+            priority
+            sizes="(max-width: 64rem) 50vw, 300px"
+            className="object-cover"
+          />
+        </span>
+      </figure>
 
-function StarIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      aria-hidden
-    >
-      <path d="m12 17.27 5.18 3.12-1.37-5.9 4.58-3.97-6.03-.52L12 4.5 9.64 10l-6.03.52 4.58 3.97-1.37 5.9z" />
-    </svg>
-  );
-}
+      <figure
+        className="reveal-plate absolute top-[2%] left-[6%] w-[30%] sm:w-[28%]"
+        style={{ "--i": 3 } as CSSProperties}
+      >
+        <span className="plate">
+          <Image
+            src={HERO_PLATES[1]}
+            alt=""
+            fill
+            sizes="(max-width: 64rem) 25vw, 150px"
+            className="object-cover"
+          />
+        </span>
+      </figure>
 
-function UtensilsIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <path d="M4 3v7a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V3M6 12v9M18 3c-1.66 0-3 2-3 5s1.34 4 3 4 0 0 0 0v9" />
-    </svg>
+      <figure
+        className="reveal-plate absolute bottom-[2%] left-[22%] w-[26%] sm:w-[24%]"
+        style={{ "--i": 4 } as CSSProperties}
+      >
+        <span className="plate">
+          <Image
+            src={HERO_PLATES[2]}
+            alt=""
+            fill
+            sizes="(max-width: 64rem) 25vw, 130px"
+            className="object-cover"
+          />
+        </span>
+      </figure>
+    </div>
   );
 }
