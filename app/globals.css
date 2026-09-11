@@ -7,250 +7,254 @@
  */
 
 @layer base {
-:root {
-  --background: var(--color-paper);
-  --foreground: var(--color-ink);
-}
+  :root {
+    --background: var(--color-paper);
+    --foreground: var(--color-ink);
+  }
 
-html {
-  overflow-x: clip;
-  scrollbar-gutter: stable;
-  scroll-behavior: smooth;
-}
+  html {
+    overflow-x: clip;
+    scrollbar-gutter: stable;
+    scroll-behavior: smooth;
+  }
 
-body {
-  overflow-x: clip;
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-body);
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
+  body {
+    overflow-x: clip;
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
 
-/* Reserve room for the floating cart bar so the footer never hides under it. */
-body[data-cart-bar="true"] {
-  padding-bottom: 6.5rem;
-}
+  /* Reserve room for the floating cart bar so the footer never hides under it. */
+  body[data-cart-bar="true"] {
+    padding-bottom: 6.5rem;
+  }
 
-h1,
-h2,
-h3,
-.display {
-  font-family: var(--font-display);
-  font-style: normal;
-  font-variation-settings: "opsz" 96;
-  letter-spacing: -0.025em;
-  overflow-wrap: anywhere;
-  min-width: 0;
-}
+  h1,
+  h2,
+  h3,
+  .display {
+    font-family: var(--font-display);
+    font-style: normal;
+    font-variation-settings: "opsz" 96;
+    letter-spacing: -0.025em;
+    overflow-wrap: anywhere;
+    min-width: 0;
+  }
 
-/* Fraunces — the outlier face. Two roles only: wordmark + footer statement. */
-.wordmark {
-  font-family: var(--font-outlier);
-  font-weight: 600;
-  font-variation-settings: "opsz" 72, "SOFT" 50;
-  letter-spacing: -0.01em;
-}
-.statement {
-  font-family: var(--font-outlier);
-  font-weight: 500;
-  font-variation-settings: "opsz" 120, "SOFT" 40;
-  letter-spacing: -0.015em;
-}
+  /* Fraunces — the outlier face. Two roles only: wordmark + footer statement. */
+  .wordmark {
+    font-family: var(--font-outlier);
+    font-weight: 600;
+    font-variation-settings:
+      "opsz" 72,
+      "SOFT" 50;
+    letter-spacing: -0.01em;
+  }
+  .statement {
+    font-family: var(--font-outlier);
+    font-weight: 500;
+    font-variation-settings:
+      "opsz" 120,
+      "SOFT" 40;
+    letter-spacing: -0.015em;
+  }
 
-.tabular {
-  font-variant-numeric: tabular-nums lining-nums;
-}
+  .tabular {
+    font-variant-numeric: tabular-nums lining-nums;
+  }
 
-/* Focus rings: keyboard-only, instant, never animated. */
-:focus {
-  outline: none;
-}
-:focus-visible {
-  outline: 2px solid var(--color-focus);
-  outline-offset: 2px;
-}
+  /* Focus rings: keyboard-only, instant, never animated. */
+  :focus {
+    outline: none;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
 }
 
 @layer components {
-/* ---- Buttons ---------------------------------------------------------- */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-xs);
-  min-height: 2.75rem;
-  padding-inline: var(--space-lg);
-  border-radius: var(--radius-pill);
-  font-size: var(--text-sm);
-  font-weight: 500;
-  line-height: 1;
-  white-space: nowrap;
-  cursor: pointer;
-  transition:
-    background-color var(--dur-short) var(--ease-out),
-    color var(--dur-short) var(--ease-out),
-    transform var(--dur-micro) var(--ease-out);
-}
-.btn:active {
-  transform: translateY(1px);
-}
-.btn:disabled,
-.btn[aria-disabled="true"] {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-.btn-ink {
-  background: var(--color-ink);
-  color: var(--color-paper);
-}
-.btn-ghost {
-  background: transparent;
-  color: var(--color-ink);
-  box-shadow: inset 0 0 0 var(--rule-hair) var(--color-rule);
-}
-.btn-paper {
-  background: var(--color-paper);
-  color: var(--color-ink);
-}
-@media (hover: hover) {
-  .btn-ink:hover {
-    background: var(--color-ink-2);
+  /* ---- Buttons ---------------------------------------------------------- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    min-height: 2.75rem;
+    padding-inline: var(--space-lg);
+    border-radius: var(--radius-pill);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background-color var(--dur-short) var(--ease-out),
+      color var(--dur-short) var(--ease-out),
+      transform var(--dur-micro) var(--ease-out);
   }
-  .btn-ghost:hover {
-    background: var(--color-paper-2);
+  .btn:active {
+    transform: translateY(1px);
   }
-  .btn-paper:hover {
-    background: var(--color-paper-2);
+  .btn:disabled,
+  .btn[aria-disabled="true"] {
+    opacity: 0.55;
+    cursor: not-allowed;
   }
-}
-
-/* Round icon button — 44 px hit target. */
-.icon-btn {
-  position: relative;
-  display: inline-grid;
-  place-items: center;
-  width: 2.75rem;
-  height: 2.75rem;
-  border-radius: var(--radius-pill);
-  cursor: pointer;
-  transition:
-    background-color var(--dur-short) var(--ease-out),
-    color var(--dur-short) var(--ease-out),
-    transform var(--dur-micro) var(--ease-out);
-}
-.icon-btn:active {
-  transform: translateY(1px);
-}
-.icon-btn:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-/* Add-to-cart: plus morphs to a check for ~1.2 s. Silent success, no toast. */
-.add-btn .ico {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  transition:
-    opacity var(--dur-micro) var(--ease-out),
-    transform var(--dur-short) var(--ease-out);
-}
-.add-btn .ico-check {
-  opacity: 0;
-  transform: scale(0.5);
-}
-.add-btn[data-state="success"] {
-  background: var(--color-accent);
-  color: var(--color-accent-ink);
-}
-.add-btn[data-state="success"] .ico-check {
-  opacity: 1;
-  transform: none;
-}
-.add-btn[data-state="success"] .ico-plus {
-  opacity: 0;
-  transform: scale(0.5);
-}
-
-/* Typographic link with an arrow that nudges on hover. */
-.link-arrow .arrow {
-  transition: transform var(--dur-short) var(--ease-out);
-}
-@media (hover: hover) {
-  .link-arrow:hover .arrow {
-    transform: translateY(3px);
+  .btn-ink {
+    background: var(--color-ink);
+    color: var(--color-paper);
   }
-}
-
-/* ---- Plates ------------------------------------------------------------ */
-.plate {
-  position: relative;
-  display: block;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  overflow: hidden;
-  background: var(--color-paper-3);
-  box-shadow: var(--shadow-plate);
-  transition: transform 500ms var(--ease-out);
-}
-@media (hover: hover) and (pointer: fine) {
-  .card:hover .plate,
-  .plate-btn:focus-visible .plate {
-    transform: rotate(8deg) scale(1.04);
+  .btn-ghost {
+    background: transparent;
+    color: var(--color-ink);
+    box-shadow: inset 0 0 0 var(--rule-hair) var(--color-rule);
   }
-}
+  .btn-paper {
+    background: var(--color-paper);
+    color: var(--color-ink);
+  }
+  @media (hover: hover) {
+    .btn-ink:hover {
+      background: var(--color-ink-2);
+    }
+    .btn-ghost:hover {
+      background: var(--color-paper-2);
+    }
+    .btn-paper:hover {
+      background: var(--color-paper-2);
+    }
+  }
 
-/* ---- One orchestrated entrance -------------------------------------- */
-.reveal {
-  opacity: 0;
-  transform: translateY(12px);
-  animation: reveal var(--dur-long) var(--ease-out) both;
-  animation-delay: calc(var(--i, 0) * 45ms);
-}
-.reveal-plate {
-  opacity: 0;
-  transform: scale(0.9) rotate(-8deg);
-  animation: reveal 600ms var(--ease-out) both;
-  animation-delay: calc(var(--i, 0) * 70ms);
-}
-@keyframes reveal {
-  to {
+  /* Round icon button — 44 px hit target. */
+  .icon-btn {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    transition:
+      background-color var(--dur-short) var(--ease-out),
+      color var(--dur-short) var(--ease-out),
+      transform var(--dur-micro) var(--ease-out);
+  }
+  .icon-btn:active {
+    transform: translateY(1px);
+  }
+  .icon-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  /* Add-to-cart: plus morphs to a check for ~1.2 s. Silent success, no toast. */
+  .add-btn .ico {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    transition:
+      opacity var(--dur-micro) var(--ease-out),
+      transform var(--dur-short) var(--ease-out);
+  }
+  .add-btn .ico-check {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  .add-btn[data-state="success"] {
+    background: var(--color-accent);
+    color: var(--color-accent-ink);
+  }
+  .add-btn[data-state="success"] .ico-check {
     opacity: 1;
     transform: none;
   }
-}
-
-/* ---- Skeleton (functional loader; keeps running under reduced motion) */
-.skeleton {
-  background: var(--color-paper-3);
-  animation: skeleton 1.4s var(--ease-in-out) infinite;
-}
-@keyframes skeleton {
-  50% {
-    opacity: 0.55;
+  .add-btn[data-state="success"] .ico-plus {
+    opacity: 0;
+    transform: scale(0.5);
   }
-}
 
-/* ---- Horizontal scrollers -------------------------------------------- */
-.no-scrollbar {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.fade-x {
-  --fade-edge: var(--page-gutter);
-  mask-image: linear-gradient(
-    to right,
-    transparent,
-    black var(--fade-edge),
-    black calc(100% - var(--fade-edge)),
-    transparent
-  );
-}
+  /* Typographic link with an arrow that nudges on hover. */
+  .link-arrow .arrow {
+    transition: transform var(--dur-short) var(--ease-out);
+  }
+  @media (hover: hover) {
+    .link-arrow:hover .arrow {
+      transform: translateY(3px);
+    }
+  }
+
+  /* ---- Plates ------------------------------------------------------------ */
+  .plate {
+    position: relative;
+    display: block;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--color-paper-3);
+    box-shadow: var(--shadow-plate);
+    transition: transform 500ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .card:hover .plate,
+    .plate-btn:focus-visible .plate {
+      transform: rotate(8deg) scale(1.04);
+    }
+  }
+
+  /* ---- One orchestrated entrance -------------------------------------- */
+  .reveal {
+    opacity: 0;
+    transform: translateY(12px);
+    animation: reveal var(--dur-long) var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * 45ms);
+  }
+  .reveal-plate {
+    opacity: 0;
+    transform: scale(0.9) rotate(-8deg);
+    animation: reveal 600ms var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * 70ms);
+  }
+  @keyframes reveal {
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* ---- Skeleton (functional loader; keeps running under reduced motion) */
+  .skeleton {
+    background: var(--color-paper-3);
+    animation: skeleton 1.4s var(--ease-in-out) infinite;
+  }
+  @keyframes skeleton {
+    50% {
+      opacity: 0.55;
+    }
+  }
+
+  /* ---- Horizontal scrollers -------------------------------------------- */
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .fade-x {
+    --fade-edge: var(--page-gutter);
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      black var(--fade-edge),
+      black calc(100% - var(--fade-edge)),
+      transparent
+    );
+  }
 }
 
 /* ---- Reduced motion: spatial motion collapses to a short crossfade ----- */
@@ -276,4 +280,9 @@ h3,
   .plate-btn:focus-visible .plate {
     transform: none;
   }
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  display: none;
 }
